@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "lfg-alarm"
+version = "0.1.0"
+description = "Ring a real alarm on a phone from code, and set alarms with LFG Alarm's tools."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.8"
+authors = [{ name = "LFG Alarm", email = "support@lfg.gm" }]
+keywords = ["alarm", "alert", "notification", "phone", "webhook", "mcp", "ai-agent"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  "Topic :: Communications",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://lfg.gm/developers"
+Source = "https://github.com/lfg-gm/lfg-alarm-sdk"
+Issues = "https://github.com/lfg-gm/lfg-alarm-sdk/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lfg_alarm"]

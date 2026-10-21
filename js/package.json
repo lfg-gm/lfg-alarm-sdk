@@ -1,0 +1,31 @@
+{
+  "name": "lfg-alarm",
+  "version": "0.1.0",
+  "description": "Ring a real alarm on a phone from code, and set alarms with LFG Alarm's tools.",
+  "keywords": ["alarm", "alert", "notification", "phone", "webhook", "mcp", "ai-agent", "lfg-alarm"],
+  "homepage": "https://lfg.gm/developers",
+  "repository": { "type": "git", "url": "git+https://github.com/lfg-gm/lfg-alarm-sdk.git", "directory": "js" },
+  "bugs": "https://github.com/lfg-gm/lfg-alarm-sdk/issues",
+  "license": "MIT",
+  "author": "LFG Alarm <support@lfg.gm>",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+    }
+  },
+  "files": ["dist", "README.md", "LICENSE"],
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.4.0"
+  }
+}
