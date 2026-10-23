@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lfg-alarm"
-version = "0.1.0"
+version = "0.2.0"
 description = "Ring a real alarm on a phone from code, and set alarms with LFG Alarm's tools."
 readme = "README.md"
 license = "MIT"

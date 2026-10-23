@@ -79,5 +79,16 @@ class ClientTests(unittest.TestCase):
         self.assertEqual(e.exception.status, 401)
 
 
+class ToolListTests(unittest.TestCase):
+    def test_tools_carry_their_input_schema(self):
+        listed = {"jsonrpc": "2.0", "id": 1, "result": {"tools": [
+            {"name": "list_my_alarms", "description": "Lists alarms.", "inputSchema": {"type": "object", "properties": {}}},
+        ]}}
+        with mock.patch.object(lfg_alarm, "_post", return_value=answer(200, listed)):
+            tools = LfgAlarm(api_key="lfg_pat_test").tools()
+        self.assertEqual(tools[0]["name"], "list_my_alarms")
+        self.assertEqual(tools[0]["input_schema"], {"type": "object", "properties": {}})
+
+
 if __name__ == "__main__":
     unittest.main()

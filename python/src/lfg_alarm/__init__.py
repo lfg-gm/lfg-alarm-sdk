@@ -25,7 +25,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 
 __all__ = ["DEFAULT_BASE_URL", "LfgAlarm", "LfgAlarmError", "RingResult", "ToolResult", "ring"]
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 DEFAULT_BASE_URL = "https://mcp.lfg.gm"
 _USER_AGENT = f"lfg-alarm-python/{__version__}"
@@ -150,9 +150,12 @@ class LfgAlarm:
         return ToolResult(text=text, data=result.get("structuredContent"))
 
     def tools(self) -> List[Dict[str, Any]]:
-        """Every tool there is, with what it does."""
+        """Every tool there is, with what it does and what it takes (``input_schema``, JSON Schema)."""
         result = self._rpc("tools/list", {}) or {}
-        return [{k: t.get(k) for k in ("name", "title", "description")} for t in result.get("tools", [])]
+        return [
+            {"name": t.get("name"), "title": t.get("title"), "description": t.get("description"), "input_schema": t.get("inputSchema")}
+            for t in result.get("tools", [])
+        ]
 
     def set_time_alarm(
         self,
