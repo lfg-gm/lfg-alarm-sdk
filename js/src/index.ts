@@ -67,6 +67,8 @@ export interface Tool {
   name: string;
   title?: string;
   description?: string;
+  /** What the tool takes, as JSON Schema. */
+  inputSchema?: Record<string, unknown>;
 }
 
 export type Day = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
@@ -168,7 +170,7 @@ export class LfgAlarm {
   /** Every tool there is, with what it does. */
   async tools(): Promise<Tool[]> {
     const result = await this.rpc('tools/list', {});
-    return ((result?.tools ?? []) as Tool[]).map(({ name, title, description }) => ({ name, title, description }));
+    return ((result?.tools ?? []) as Tool[]).map(({ name, title, description, inputSchema }) => ({ name, title, description, inputSchema }));
   }
 
   /** A time alarm, once (`date`) or on repeat days (`repeatDays`). */

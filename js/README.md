@@ -8,7 +8,7 @@ LFG Alarm is a social alarm clock for iPhone and Android. Rocco, LFG's agent, ri
 npm install lfg-alarm
 ```
 
-Node 18 or later, or any runtime with `fetch`. No dependencies.
+Node 18 or later, or any runtime with `fetch`. No dependencies; `lfg-alarm/ai` needs the `ai` package you already have.
 
 ## Ring a phone when something happens
 
@@ -53,6 +53,37 @@ const tools = await lfg.tools(); // all of them, with what each does
 ```
 
 A tool that says no (a plan limit, a bad time) throws an `LfgAlarmError` with LFG Alarm's own words.
+
+## Use it in the Vercel AI SDK
+
+`lfg-alarm/ai` gives an AI SDK agent LFG Alarm's tools, read from the hosted server so they are always the current ones, and a `ringPhone` tool that rings an Anything alarm. Install `ai` alongside (version 5 or later).
+
+```js
+import { generateText, isStepCount } from 'ai';
+import { lfgAlarmTools } from 'lfg-alarm/ai';
+
+const { text } = await generateText({
+  model: 'openai/gpt-5-mini',
+  prompt: 'Wake me at 7 on weekdays with something upbeat. I am in London.',
+  tools: await lfgAlarmTools(), // LFG_API_KEY, or { apiKey }
+  stopWhen: isStepCount(3),
+});
+```
+
+Pass `only` to give the model a few tools: `lfgAlarmTools({ only: ['set_time_alarm', 'list_my_alarms', 'delete_alarm'] })`.
+
+For an agent that should get your attention when a long job is done, `ringPhone()` rings the Anything alarm at `LFG_RING_URL` (no key needed):
+
+```js
+import { ringPhone } from 'lfg-alarm/ai';
+
+await generateText({
+  model: 'openai/gpt-5-mini',
+  prompt: 'Run the report, and ring my phone when it is ready.',
+  tools: { ringPhone: ringPhone(), ...yourTools },
+  stopWhen: isStepCount(10),
+});
+```
 
 ## What it talks to
 

@@ -1,10 +1,27 @@
 {
   "name": "lfg-alarm",
-  "version": "0.1.0",
-  "description": "Ring a real alarm on a phone from code, and set alarms with LFG Alarm's tools.",
-  "keywords": ["alarm", "alert", "notification", "phone", "webhook", "mcp", "ai-agent", "lfg-alarm"],
+  "version": "0.2.0",
+  "description": "Ring a real alarm on a phone from code, set alarms with LFG Alarm's tools, and give them to AI SDK agents.",
+  "keywords": [
+    "ai-agent",
+    "ai-sdk",
+    "ai-tools",
+    "alarm",
+    "alert",
+    "lfg-alarm",
+    "mcp",
+    "notification",
+    "phone",
+    "tools",
+    "vercel-ai",
+    "webhook"
+  ],
   "homepage": "https://lfg.gm/developers",
-  "repository": { "type": "git", "url": "git+https://github.com/lfg-gm/lfg-alarm-sdk.git", "directory": "js" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lfg-gm/lfg-alarm-sdk.git",
+    "directory": "js"
+  },
   "bugs": "https://github.com/lfg-gm/lfg-alarm-sdk/issues",
   "license": "MIT",
   "author": "LFG Alarm <support@lfg.gm>",
@@ -14,18 +31,49 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
-      "require": { "types": "./dist/index.d.cts", "default": "./dist/index.cjs" }
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./ai": {
+      "import": {
+        "types": "./dist/ai.d.ts",
+        "default": "./dist/ai.js"
+      },
+      "require": {
+        "types": "./dist/ai.d.cts",
+        "default": "./dist/ai.cjs"
+      }
     }
   },
-  "files": ["dist", "README.md", "LICENSE"],
-  "engines": { "node": ">=18" },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
-    "build": "tsup src/index.ts --format esm,cjs --dts --clean",
+    "build": "tsup src/index.ts src/ai.ts --format esm,cjs --dts --clean --external ai",
     "test": "node --test test/*.test.mjs"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "ai": "^7.0.0"
+  },
+  "peerDependencies": {
+    "ai": ">=5"
+  },
+  "peerDependenciesMeta": {
+    "ai": {
+      "optional": true
+    }
   }
 }
