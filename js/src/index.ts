@@ -2,7 +2,9 @@
  * LFG Alarm for JavaScript and TypeScript: ring a real alarm on a phone from
  * code, and set alarms with a personal key.
  *
- * Two ways in:
+ * Three ways in:
+ *  - `addLink(event)` builds a Set an LFG alarm link for an event page or an
+ *    email, the way an Add to calendar link works. No key needed.
  *  - `ring(url)` calls an Anything alarm's private link. No key needed: the
  *    link is the permission. Make the alarm in the LFG Alarm app, or with
  *    `setWebhookAlarm`.
@@ -192,4 +194,68 @@ export class LfgAlarm {
   deleteAlarm(id: string): Promise<ToolResult> {
     return this.call('delete_alarm', { id });
   }
+}
+
+/** An event, for `addLink`. */
+export interface AddLinkEvent {
+  /** The event's page. On its own, LFG Alarm reads the page for the name, start, place and picture. */
+  url?: string;
+  title?: string;
+  /** When it starts: a Date, or an ISO time with its offset ("2026-11-14T20:00:00-08:00") or Z. A time with no zone is left off, never guessed. */
+  start?: Date | string;
+  location?: string;
+  /** A picture for the alarm, https only. */
+  image?: string;
+  description?: string;
+}
+
+const EXACT = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?([zZ]|[+-]\d{2}:?\d{2})$/;
+
+function moment(v: Date | string | undefined): string | null {
+  if (v instanceof Date) return Number.isNaN(v.getTime()) ? null : v.toISOString();
+  if (!v || !EXACT.test(v.trim())) return null;
+  const t = Date.parse(v.trim());
+  return Number.isNaN(t) ? null : new Date(t).toISOString();
+}
+
+function web(v: string | undefined, httpsOnly = false): string | null {
+  if (!v) return null;
+  try {
+    const u = new URL(v);
+    return (httpsOnly ? u.protocol === 'https:' : /^https?:$/.test(u.protocol)) ? u.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+const words = (v: string | undefined, max: number) => {
+  const s = (v ?? '').replace(/\s+/g, ' ').trim();
+  return s ? s.slice(0, max) : null;
+};
+
+/**
+ * A Set an LFG alarm link (https://lfg.gm/add) for an event: put it behind the
+ * badge beside Add to calendar. Tapped, it opens the LFG Alarm app (or lfg.gm
+ * without it) on that event, and the person picks how early it rings. The link
+ * alone sets nothing. Give `url` alone and the page is read; add `title` and
+ * `start` and nothing is read. Throws when it names no event at all.
+ *
+ * Badges and the rules: https://lfg.gm/developers#add-button
+ */
+export function addLink(event: AddLinkEvent): string {
+  const q = new URLSearchParams();
+  const url = web(event.url);
+  const title = words(event.title, 140);
+  if (!url && !title) throw new LfgAlarmError('addLink needs the event page (url) or its title.');
+  if (url) q.set('url', url);
+  if (title) q.set('title', title);
+  const start = moment(event.start);
+  if (start) q.set('start', start);
+  const location = words(event.location, 200);
+  if (location) q.set('location', location);
+  const image = web(event.image, true);
+  if (image) q.set('image', image);
+  const description = words(event.description, 500);
+  if (description) q.set('description', description);
+  return `https://lfg.gm/add?${q.toString()}`;
 }

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { LfgAlarm, LfgAlarmError, ring } from '../dist/index.js';
+import { addLink, LfgAlarm, LfgAlarmError, ring } from '../dist/index.js';
 
 const reply = (status, body, headers = {}) =>
   new Response(typeof body === 'string' ? body : JSON.stringify(body), { status, headers: { 'content-type': 'application/json', ...headers } });
@@ -65,4 +65,24 @@ test('no key says where to get one', async () => {
 test('a refused key says so', async () => {
   const lfg = new LfgAlarm({ apiKey: 'bad', fetch: async () => reply(401, { error: 'unauthorized' }) });
   await assert.rejects(lfg.listAlarms(), (e) => e instanceof LfgAlarmError && e.status === 401);
+});
+
+test('addLink: the event page alone', () => {
+  assert.equal(addLink({ url: 'https://lu.ma/abc' }), 'https://lfg.gm/add?url=https%3A%2F%2Flu.ma%2Fabc');
+});
+
+test('addLink: the details, start as an exact moment', () => {
+  const link = new URL(addLink({ title: 'Rooftop Party', start: '2026-11-14T20:00:00-08:00', location: 'LA', url: 'https://posh.vip/e/x' }));
+  assert.equal(link.searchParams.get('start'), '2026-11-15T04:00:00.000Z');
+  assert.equal(link.searchParams.get('title'), 'Rooftop Party');
+});
+
+test('addLink: a start with no zone and an http picture are left off', () => {
+  const link = new URL(addLink({ title: 'Party', start: '2026-11-14T20:00', image: 'http://a.com/p.png' }));
+  assert.equal(link.searchParams.has('start'), false);
+  assert.equal(link.searchParams.has('image'), false);
+});
+
+test('addLink: no page and no title throws', () => {
+  assert.throws(() => addLink({ location: 'LA' }), LfgAlarmError);
 });

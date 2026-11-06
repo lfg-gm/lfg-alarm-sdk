@@ -24,6 +24,21 @@ result = ring(os.environ["LFG_RING_URL"])
 # or rang=False with message="This alarm is switched off."
 ```
 
+## A Set an LFG alarm button for your event
+
+`add_link` builds the link to put behind a Set an LFG alarm badge, beside Add to calendar on an event page or in an email. No key needed. Tapped, it opens the LFG Alarm app (or lfg.gm) on that event, and the person picks how early it rings; the link alone sets nothing.
+
+```python
+from lfg_alarm import add_link
+
+add_link(url="https://lu.ma/your-event")  # we read the page
+
+add_link(title="Rooftop Party", start="2026-11-14T20:00:00-08:00",
+         location="Los Angeles", url="https://yoursite.com/e/123")  # nothing is read
+```
+
+`start` is a timezone-aware `datetime` or an ISO time with its offset; one without a time zone is left off, never guessed. Badges: https://lfg.gm/developers#add-button
+
 ## Set alarms with a personal key
 
 Make a key in the LFG Alarm app: **Settings** > **AI apps and keys**. Pass it as `api_key`, or set `LFG_API_KEY`.

@@ -1,6 +1,6 @@
 {
   "name": "lfg-alarm",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Ring a real alarm on a phone from code, set alarms with LFG Alarm's tools, and give them to AI SDK agents.",
   "keywords": [
     "ai-agent",

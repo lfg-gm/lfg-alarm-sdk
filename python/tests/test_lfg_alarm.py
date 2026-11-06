@@ -3,7 +3,7 @@ import unittest
 from unittest import mock
 
 import lfg_alarm
-from lfg_alarm import LfgAlarm, LfgAlarmError, ring
+from lfg_alarm import LfgAlarm, LfgAlarmError, add_link, ring
 
 
 def answer(status, body, headers=None):
@@ -89,6 +89,23 @@ class ToolListTests(unittest.TestCase):
         self.assertEqual(tools[0]["name"], "list_my_alarms")
         self.assertEqual(tools[0]["input_schema"], {"type": "object", "properties": {}})
 
+
+
+class AddLinkTests(unittest.TestCase):
+    def test_page_alone(self):
+        self.assertEqual(add_link(url="https://lu.ma/abc"), "https://lfg.gm/add?url=https%3A%2F%2Flu.ma%2Fabc")
+
+    def test_details(self):
+        link = add_link(title="Rooftop Party", start="2026-11-14T20:00:00-08:00", location="LA", url="https://posh.vip/e/x")
+        self.assertIn("start=2026-11-15T04%3A00%3A00.000Z", link)
+        self.assertIn("title=Rooftop%20Party", link)
+
+    def test_no_zone_left_off(self):
+        self.assertNotIn("start=", add_link(title="Party", start="2026-11-14T20:00"))
+
+    def test_names_nothing(self):
+        with self.assertRaises(LfgAlarmError):
+            add_link(location="LA")
 
 if __name__ == "__main__":
     unittest.main()

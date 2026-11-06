@@ -1,8 +1,10 @@
 """LFG Alarm for Python: ring a real alarm on a phone from code, and set alarms
 with a personal key.
 
-Two ways in:
+Three ways in:
 
+- ``add_link(...)`` builds a Set an LFG alarm link for an event page or an
+  email, the way an Add to calendar link works. No key needed.
 - ``ring(url)`` calls an Anything alarm's private link. No key needed: the link
   is the permission. Make the alarm in the LFG Alarm app, or with
   ``LfgAlarm.set_webhook_alarm``.
@@ -20,12 +22,14 @@ import json
 import os
 import re
 import urllib.error
+import urllib.parse
 import urllib.request
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-__all__ = ["DEFAULT_BASE_URL", "LfgAlarm", "LfgAlarmError", "RingResult", "ToolResult", "ring"]
-__version__ = "0.2.0"
+__all__ = ["DEFAULT_BASE_URL", "LfgAlarm", "LfgAlarmError", "RingResult", "ToolResult", "add_link", "ring"]
+__version__ = "0.3.0"
 
 DEFAULT_BASE_URL = "https://mcp.lfg.gm"
 _USER_AGENT = f"lfg-alarm-python/{__version__}"
@@ -184,3 +188,69 @@ class LfgAlarm:
 
     def delete_alarm(self, id: str) -> ToolResult:
         return self.call("delete_alarm", id=id)
+
+
+_EXACT = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?([zZ]|[+-]\d{2}:?\d{2})$")
+
+
+def _moment(start: Any) -> Optional[str]:
+    if isinstance(start, datetime):
+        if start.tzinfo is None:
+            return None
+        when = start
+    elif isinstance(start, str) and _EXACT.match(start.strip()):
+        try:
+            when = datetime.fromisoformat(start.strip().replace("Z", "+00:00").replace("z", "+00:00"))
+        except ValueError:
+            return None
+    else:
+        return None
+    return when.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.") + f"{when.microsecond // 1000:03d}Z"
+
+
+def _web(value: Optional[str], https_only: bool = False) -> Optional[str]:
+    if not value:
+        return None
+    parts = urllib.parse.urlsplit(value)
+    ok = parts.scheme == "https" if https_only else parts.scheme in ("http", "https")
+    return value if ok and parts.netloc else None
+
+
+def _words(value: Optional[str], limit: int) -> Optional[str]:
+    text = " ".join((value or "").split())
+    return text[:limit] or None
+
+
+def add_link(
+    url: Optional[str] = None,
+    title: Optional[str] = None,
+    start: Any = None,
+    location: Optional[str] = None,
+    image: Optional[str] = None,
+    description: Optional[str] = None,
+) -> str:
+    """A Set an LFG alarm link (https://lfg.gm/add) for an event: put it behind
+    the badge beside Add to calendar. Tapped, it opens the LFG Alarm app (or
+    lfg.gm without it) on that event, and the person picks how early it rings.
+    The link alone sets nothing.
+
+    Give ``url`` alone and the page is read; add ``title`` and ``start`` and
+    nothing is read. ``start`` is a timezone-aware datetime or an ISO time with
+    its offset ("2026-11-14T20:00:00-08:00"); one without a zone is left off,
+    never guessed. Raises LfgAlarmError when it names no event at all.
+
+    Badges and the rules: https://lfg.gm/developers#add-button
+    """
+    page = _web(url)
+    name = _words(title, 140)
+    if not page and not name:
+        raise LfgAlarmError("add_link needs the event page (url) or its title.")
+    fields = [
+        ("url", page),
+        ("title", name),
+        ("start", _moment(start)),
+        ("location", _words(location, 200)),
+        ("image", _web(image, https_only=True)),
+        ("description", _words(description, 500)),
+    ]
+    return "https://lfg.gm/add?" + urllib.parse.urlencode([(k, v) for k, v in fields if v], quote_via=urllib.parse.quote)

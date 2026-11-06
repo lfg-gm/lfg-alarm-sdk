@@ -9,8 +9,9 @@ Ring a real alarm on a phone from code, and set alarms with [LFG Alarm](https://
 | JavaScript / TypeScript | `npm install lfg-alarm` | [js/README.md](js/README.md) |
 | Python | `pip install lfg-alarm` | [python/README.md](python/README.md) |
 
-Both are small, have no dependencies, and do the same two things:
+Both are small, have no dependencies, and do the same three things:
 
+- **`addLink` / `add_link`**: build a Set an LFG alarm link for an event page or an email, beside Add to calendar. No key needed. ([Badges](https://lfg.gm/developers#add-button))
 - **`ring(url)`**: call a 🔮 **Anything alarm**'s private link and every phone on it rings. No key needed.
 - **`LfgAlarm`**: with a personal key (LFG Alarm app: **Settings** > **AI apps and keys**), set, change and delete alarms through LFG Alarm's hosted MCP server, `https://mcp.lfg.gm`.
 
