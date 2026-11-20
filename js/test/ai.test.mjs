@@ -12,7 +12,7 @@ test('lfgAlarmTools: the server tools as AI SDK tools, and execute calls the too
     if (body.method === 'tools/list') {
       return reply(200, { jsonrpc: '2.0', id: body.id, result: { tools: [
         { name: 'set_time_alarm', description: 'Sets an alarm.', inputSchema: { type: 'object', properties: { time: { type: 'string' } }, required: ['time'] } },
-        { name: 'list_my_alarms', description: 'Lists alarms.', inputSchema: { type: 'object', properties: {} } },
+        { name: 'list_my_links', description: 'Lists LFG links.', inputSchema: { type: 'object', properties: {} } },
       ] } });
     }
     return reply(200, { jsonrpc: '2.0', id: body.id, result: { content: [{ type: 'text', text: 'Set for 07:00.' }] } });

@@ -44,12 +44,12 @@ test('call sends a tools/call with snake_case arguments and the key', async () =
 
 test('a tool refusal throws with its words', async () => {
   const lfg = new LfgAlarm({ apiKey: 'k', fetch: async () => reply(200, { jsonrpc: '2.0', id: 1, result: { isError: true, content: [{ type: 'text', text: 'Needs a paid plan.' }] } }) });
-  await assert.rejects(lfg.listAlarms(), /Needs a paid plan/);
+  await assert.rejects(lfg.listLinks(), /Needs a paid plan/);
 });
 
 test('an event-stream answer is read too', async () => {
   const lfg = new LfgAlarm({ apiKey: 'k', fetch: async () => reply(200, 'event: message\ndata: {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}]}}\n\n', { 'content-type': 'text/event-stream' }) });
-  assert.equal((await lfg.listAlarms()).text, 'ok');
+  assert.equal((await lfg.listLinks()).text, 'ok');
 });
 
 test('setWebhookAlarm returns the ring link', async () => {
@@ -59,12 +59,12 @@ test('setWebhookAlarm returns the ring link', async () => {
 
 test('no key says where to get one', async () => {
   const lfg = new LfgAlarm({ apiKey: '', fetch: async () => reply(200, {}) });
-  await assert.rejects(lfg.listAlarms(), /AI apps and keys/);
+  await assert.rejects(lfg.listLinks(), /AI apps and keys/);
 });
 
 test('a refused key says so', async () => {
   const lfg = new LfgAlarm({ apiKey: 'bad', fetch: async () => reply(401, { error: 'unauthorized' }) });
-  await assert.rejects(lfg.listAlarms(), (e) => e instanceof LfgAlarmError && e.status === 401);
+  await assert.rejects(lfg.listLinks(), (e) => e instanceof LfgAlarmError && e.status === 401);
 });
 
 test('addLink: the event page alone', () => {

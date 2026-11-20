@@ -158,7 +158,7 @@ export class LfgAlarm {
     return msg.result;
   }
 
-  /** Calls any of LFG Alarm's tools by name ("set_price_alarm"), with its arguments in snake_case or camelCase. */
+  /** Calls any of LFG Alarm's tools by name ("monitor_price"), with its arguments in snake_case or camelCase. */
   async call(tool: string, args: Record<string, unknown> = {}): Promise<ToolResult> {
     const result = await this.rpc('tools/call', { name: tool, arguments: snake(args) });
     const text = ((result?.content ?? []) as { type: string; text?: string }[])
@@ -186,13 +186,13 @@ export class LfgAlarm {
     return { ...result, ringUrl: result.text.match(/https:\/\/\S+\/horn\/[A-Za-z0-9]+/)?.[0] ?? null };
   }
 
-  /** The person's alarms, in plain words. */
-  listAlarms(): Promise<ToolResult> {
-    return this.call('list_my_alarms');
+  /** The person's LFG links, in plain words: what each is doing and how it reaches them. */
+  listLinks(): Promise<ToolResult> {
+    return this.call('list_my_links');
   }
 
-  deleteAlarm(id: string): Promise<ToolResult> {
-    return this.call('delete_alarm', { id });
+  deleteLink(id: string): Promise<ToolResult> {
+    return this.call('delete_link', { id });
   }
 }
 

@@ -29,7 +29,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 __all__ = ["DEFAULT_BASE_URL", "LfgAlarm", "LfgAlarmError", "RingResult", "ToolResult", "add_link", "ring"]
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 DEFAULT_BASE_URL = "https://mcp.lfg.gm"
 _USER_AGENT = f"lfg-alarm-python/{__version__}"
@@ -146,7 +146,7 @@ class LfgAlarm:
         return msg.get("result")
 
     def call(self, tool: str, **args: Any) -> ToolResult:
-        """Calls any of LFG Alarm's tools by name ("set_price_alarm"), with its arguments."""
+        """Calls any of LFG Alarm's tools by name ("monitor_price"), with its arguments."""
         result = self._rpc("tools/call", {"name": tool, "arguments": _snake(args)}) or {}
         text = "\n".join(c.get("text", "") for c in result.get("content", []) if c.get("type") == "text")
         if result.get("isError"):
@@ -183,11 +183,11 @@ class LfgAlarm:
         result.ring_url = match.group(0) if match else None
         return result
 
-    def list_alarms(self) -> ToolResult:
-        return self.call("list_my_alarms")
+    def list_links(self) -> ToolResult:
+        return self.call("list_my_links")
 
-    def delete_alarm(self, id: str) -> ToolResult:
-        return self.call("delete_alarm", id=id)
+    def delete_link(self, id: str) -> ToolResult:
+        return self.call("delete_link", id=id)
 
 
 _EXACT = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?([zZ]|[+-]\d{2}:?\d{2})$")

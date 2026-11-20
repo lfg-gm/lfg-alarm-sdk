@@ -55,12 +55,12 @@ class ClientTests(unittest.TestCase):
     def test_refusal_raises_with_its_words(self):
         with mock.patch.object(lfg_alarm, "_post", return_value=answer(200, {"jsonrpc": "2.0", "id": 1, "result": {"isError": True, "content": [{"type": "text", "text": "Needs a paid plan."}]}})):
             with self.assertRaisesRegex(LfgAlarmError, "Needs a paid plan"):
-                LfgAlarm(api_key="k").list_alarms()
+                LfgAlarm(api_key="k").list_links()
 
     def test_event_stream_answer(self):
         stream = 'event: message\ndata: {"jsonrpc":"2.0","id":1,"result":{"content":[{"type":"text","text":"ok"}]}}\n\n'
         with mock.patch.object(lfg_alarm, "_post", return_value=answer(200, stream, {"Content-Type": "text/event-stream"})):
-            self.assertEqual(LfgAlarm(api_key="k").list_alarms().text, "ok")
+            self.assertEqual(LfgAlarm(api_key="k").list_links().text, "ok")
 
     def test_webhook_alarm_returns_the_ring_link(self):
         text = "Address to call (a POST request rings it): https://api.lfg.gm/horn/abc123\nMore"
@@ -70,23 +70,23 @@ class ClientTests(unittest.TestCase):
     def test_no_key_says_where_to_get_one(self):
         with mock.patch.dict("os.environ", {}, clear=True):
             with self.assertRaisesRegex(LfgAlarmError, "AI apps and keys"):
-                LfgAlarm().list_alarms()
+                LfgAlarm().list_links()
 
     def test_refused_key(self):
         with mock.patch.object(lfg_alarm, "_post", return_value=answer(401, {"error": "unauthorized"})):
             with self.assertRaises(LfgAlarmError) as e:
-                LfgAlarm(api_key="bad").list_alarms()
+                LfgAlarm(api_key="bad").list_links()
         self.assertEqual(e.exception.status, 401)
 
 
 class ToolListTests(unittest.TestCase):
     def test_tools_carry_their_input_schema(self):
         listed = {"jsonrpc": "2.0", "id": 1, "result": {"tools": [
-            {"name": "list_my_alarms", "description": "Lists alarms.", "inputSchema": {"type": "object", "properties": {}}},
+            {"name": "list_my_links", "description": "Lists LFG links.", "inputSchema": {"type": "object", "properties": {}}},
         ]}}
         with mock.patch.object(lfg_alarm, "_post", return_value=answer(200, listed)):
             tools = LfgAlarm(api_key="lfg_pat_test").tools()
-        self.assertEqual(tools[0]["name"], "list_my_alarms")
+        self.assertEqual(tools[0]["name"], "list_my_links")
         self.assertEqual(tools[0]["input_schema"], {"type": "object", "properties": {}})
 
 

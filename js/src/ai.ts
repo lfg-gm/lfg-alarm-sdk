@@ -19,7 +19,7 @@ function readEnv(name: string): string | undefined {
 
 /**
  * LFG Alarm's tools, ready for `generateText` or `streamText`. Pass `only`
- * with tool names ("set_time_alarm", "list_my_alarms") to give the model a
+ * with tool names ("set_time_alarm", "list_my_links") to give the model a
  * few instead of all of them.
  */
 export async function lfgAlarmTools(

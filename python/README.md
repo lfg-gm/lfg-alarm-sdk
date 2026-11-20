@@ -59,13 +59,13 @@ lfg.set_time_alarm(
 hook = lfg.set_webhook_alarm("Deploy failed", quiet_for="5_min")
 print(hook.ring_url)
 
-print(lfg.list_alarms().text)
+print(lfg.list_links().text)
 ```
 
 Every other tool works through `call`:
 
 ```python
-lfg.call("set_price_alarm", token_id="solana", symbol="SOL", name="Solana", percent=10)
+lfg.call("monitor_price", token_id="solana", symbol="SOL", name="Solana", percent=10)
 tools = lfg.tools()  # all of them, with what each does
 ```
 

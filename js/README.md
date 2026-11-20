@@ -58,13 +58,13 @@ await lfg.setTimeAlarm({
 
 const { ringUrl } = await lfg.setWebhookAlarm({ title: 'Deploy failed', quietFor: '5_min' });
 
-console.log((await lfg.listAlarms()).text);
+console.log((await lfg.listLinks()).text);
 ```
 
 Every other tool works through `call`, with its arguments in camelCase or snake_case:
 
 ```js
-await lfg.call('set_price_alarm', { tokenId: 'solana', symbol: 'SOL', name: 'Solana', percent: 10 });
+await lfg.call('monitor_price', { tokenId: 'solana', symbol: 'SOL', name: 'Solana', percent: 10 });
 const tools = await lfg.tools(); // all of them, with what each does
 ```
 
@@ -86,7 +86,7 @@ const { text } = await generateText({
 });
 ```
 
-Pass `only` to give the model a few tools: `lfgAlarmTools({ only: ['set_time_alarm', 'list_my_alarms', 'delete_alarm'] })`.
+Pass `only` to give the model a few tools: `lfgAlarmTools({ only: ['set_time_alarm', 'list_my_links', 'delete_link'] })`.
 
 For an agent that should get your attention when a long job is done, `ringPhone()` rings the Anything alarm at `LFG_RING_URL` (no key needed):
 
